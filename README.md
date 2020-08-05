@@ -1,1 +1,3 @@
-WebIDL-Sublime
+# WebIDL Syntax Highlighting for Sublime Text
+
+This package provides WebIDL syntax highlighting based upon the [W3C Spec](https://heycam.github.io/webidl/) for Sublime Text, designed to provide as much functionality as possible, including symbol detection and a little bit of syntax validation.  (Note that this package is not designed to support Microsoft's IDL format -- check out [andik's package](https://packagecontrol.io/packages/IDL-Syntax) for that).

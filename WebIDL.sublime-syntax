@@ -1,0 +1,337 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: WebIDL
+file_extensions:
+  - idl
+  - webidl
+scope: source.webidl
+
+variables:
+  ident: (?:[_A-Za-z][_A-Za-z0-9]*\b)
+  type: (?:(?:(?:unsigned|unrestricted)\s+)?(?:long\s+)?{{ident}}(?:<{{ident}}(?:,\s*{{ident}})?>|\?)?)
+
+  argument_modifiers: (?:async|attribute|callback|const|constructor|deleter|dictionary|enum|getter|includes|inherit|interface|iterable|maplike|mixin|namespace|partial|readonly|required|setlike|setter|static|stringifier|typedef|unrestricted)
+
+contexts:
+  prototype:
+    - include: comments
+
+  any_POP:
+    - match: '(?=\S)'
+      pop: true
+
+  main:
+    - include: basic-types
+    - include: punctuation
+    - include: extended-attributes
+    - include: interface
+    - include: interface-inclusion
+    - include: namespace
+    - include: typedef
+    - include: enum
+    - include: dictionary
+    - include: constant
+    - include: callback
+
+  basic-types:
+    - include: numbers
+    - include: strings
+    - include: boolean
+
+  numbers:
+    - match: '\b(-)?[0-9.]+\b'
+      scope: constant.numeric.webidl
+
+  strings:
+    - match: '"'
+      scope: punctuation.definition.string.begin.webidl
+      push: inside_string
+
+  inside_string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.webidl
+    - match: '\.'
+      scope: constant.character.escape.webidl
+    - match: '"'
+      scope: punctuation.definition.string.end.webidl
+      pop: true
+
+  boolean:
+    - match: \b(true|false|null)\b
+      scope: constant.language.webidl
+
+  punctuation:
+    - match: ;
+      scope: punctuation.terminator.webidl
+
+  comments:
+    - match: /\*\*/
+      scope: comment.block.empty.webidl punctuation.definition.comment.webidl
+    - include: comments-inline
+
+  comments-inline:
+    - match: /\*
+      scope: punctuation.definition.comment.webidl
+      push:
+        - meta_scope: comment.block.webidl
+        - match: \*/
+          scope: punctuation.definition.comment.webidl
+          pop: true
+    - match: //
+      scope: punctuation.definition.comment.webidl
+      push:
+        - meta_scope: comment.line.double-slash.webidl
+        - match: $\n?
+          pop: true
+        - match: '(?=%>)'
+          pop: true
+
+  # Extended Attributes
+  extended-attributes:
+    - match: (\[)
+      scope: punctuation.section.block.begin.webidl
+      push:
+        - meta_scope: meta.annotation.parameters.webidl
+        - match: (\])
+          scope: punctuation.section.block.end.webidl
+          pop: true
+        - match: \,
+          scope: punctuation.separator.comma.webidl
+        - match: (?:(\b{{ident}}\b)(?:(=)(\b{{ident}}\b))?(\())
+          captures:
+            1: variable.annotation.webidl
+            2: keyword.operator.assignment.webidl
+            3: entity.name.webidl
+            4: punctuation.section.block.begin.webidl
+          push:
+            - meta_scope: meta.method.parameters.webidl
+            - include: method-arguments-raw
+            - match: \)
+              scope: punctuation.section.block.end.webidl
+              pop: true
+        - match: (\b{{ident}}\b)(=)\(\b(?:({{ident}})(,))*({{ident}})\b\)
+          captures:
+            1: variable.annotation.webidl
+            2: keyword.operator.assignment.webidl
+            3: entity.name.webidl
+            4: punctuation.separator.comma.webidl
+            5: entity.name.webidl
+        - match: (\b{{ident}}\b)(=)(\b{{ident}}\b)
+          captures:
+            1: variable.annotation.webidl
+            2: keyword.operator.assignment.webidl
+            3: entity.name.webidl
+            4: punctuation.separator.comma.webidl
+            5: entity.name.webidl
+        - match: (\b{{ident}}\b)
+          scope: variable.annotation.webidl
+
+  # Interfaces
+  interface:
+    - match: (?=((partial|callback)\s+)?(interface)(\s+mixin)?\s+({{ident}})(\s:\s)?({{ident}})?)
+      push:
+        - meta_scope: meta.interface.webidl
+        - match: (?:\b(partial|callback)\s+)?(\binterface\b)(\s+mixin\b)?\s+({{ident}})(\s:\s)?({{ident}})?
+          scope: meta.interface.identifier.webidl
+          captures:
+            1: storage.modifier.interface.webidl
+            2: storage.type.interface.webidl
+            3: storage.modifier.interface.webidl
+            4: entity.name.interface.webidl
+            5: punctuation.separator
+            6: entity.other.inherited-class.webidl
+        - match: "{"
+          scope: punctuation.section.block.begin.webidl
+          push:
+            - meta_scope: meta.interface.body.webidl
+            - match: (\})(\s*\n)?
+              captures:
+                1: punctuation.definition.invalid.webidl
+                2: invalid.illegal.you-forgot-semicolon.webidl
+              pop: true
+            - match: "}"
+              scope: punctuation.section.block.end.webidl
+              pop: true
+            - include: interface-body
+        - include: any_POP
+
+  interface-body:
+    - include: interface-attribute
+    - include: method
+    - include: extended-attributes
+
+  interface-attribute:
+    - match: ((?:\b{{argument_modifiers}}\s+)*)?(\battribute\b)\s+(\b{{type}})\s+({{ident}})
+      scope: variable.other.member.webidl
+      captures:
+        1: storage.modifier.webidl
+        2: keyword.control.webidl
+        3: storage.type.webidl
+        4: variable.other.webidl
+
+  method:
+    - match: (?:(async\s+)?(\b{{type}})\s+({{ident}})|((?:C|c)onstructor))
+      scope: meta.method.webidl
+      captures:
+        1: storage.modifier.webidl
+        2: storage.type.webidl
+        3: entity.name.method.webidl
+        4: entity.name.method.webidl
+    - include: method-arguments
+
+  method-arguments:
+    - match: \(
+      scope: punctuation.section.block.begin.webidl
+      push:
+        - meta_scope: meta.method.parameters.webidl
+        - include: method-arguments-raw
+        - match: '(\})(\s*\n)?'
+          captures:
+            1: punctuation.definition.invalid.webidl
+            2: invalid.illegal.you-forgot-semicolon.webidl
+          pop: true
+        - match: \)
+          scope: punctuation.section.block.end.webidl
+          pop: true
+
+  method-arguments-raw:
+    - include: method-argument
+    - match: \,
+      scope: punctuation.separator.comma.webidl
+
+  method-argument:
+    - match: (\boptional\s+)?(\b{{type}})\s+({{ident}})(?:\s+(=)\s+)?
+      scope: variable.parameter.webidl
+      captures:
+        1: storage.modifier.webidl
+        2: storage.type.webidl
+        3: variable.parameter.webidl
+        4: keyword.operator.assignment.webidl
+    - include: basic-types
+
+  interface-inclusion:
+    - match: \b({{ident}})(\s+includes\s+)({{ident}})
+      captures:
+        1: entity.name.interface.webidl
+        2: keyword.other.webidl
+        3: entity.name.interface.webidl
+
+  # Namespace
+  namespace:
+    - match: (?=((partial)\s+)?(namespace\s+({{ident}})))
+      push:
+        - meta_scope: meta.namespace.webidl
+        - match: (?:\b(partial)\s+)?(\bnamespace\b)\s+({{ident}})
+          scope: meta.namespace.identifier.webidl
+          captures:
+            1: storage.modifier.namespace.webidl
+            2: storage.type.namespace.webidl
+            3: entity.name.namespace.webidl
+        - match: "{"
+          scope: punctuation.section.block.begin.webidl
+          push:
+            - meta_scope: meta.namespace.body.webidl
+            - match: (\})(\s*\n)?
+              captures:
+                1: punctuation.definition.invalid.webidl
+                2: invalid.illegal.you-forgot-semicolon.webidl
+              pop: true
+            - match: "}"
+              scope: punctuation.section.block.end.webidl
+              pop: true
+            - include: interface-body
+        - include: any_POP
+
+  # Typedef
+  typedef:
+    - match: (\btypedef\b)\s+(\b{{type}})\s+({{ident}})
+      scope: meta.type.webidl
+      captures:
+        1: keyword.control.webidl
+        2: storage.type.webidl
+        3: entity.name.type.webidl
+
+  # Enum
+  enum:
+    - match: (?=(enum\s+{{ident}}))
+      push:
+        - meta_scope: meta.enum.webidl
+        - match: (\benum\b)\s+({{ident}})
+          scope: meta.enum.identifier.webidl
+          captures:
+            1: storage.type.enum.webidl
+            2: entity.name.enum.webidl
+        - match: "{"
+          scope: punctuation.section.block.begin.webidl
+          push:
+            - meta_scope: meta.enum.body.webidl
+            - match: (\})(\s*\n)?
+              captures:
+                1: punctuation.definition.invalid.webidl
+                2: invalid.illegal.you-forgot-semicolon.webidl
+              pop: true
+            - match: "}"
+              scope: punctuation.section.block.end.webidl
+              pop: true
+            - include: basic-types
+        - include: any_POP
+
+  # Dictionary
+  dictionary:
+    - match: (?=((partial)\s+)?(dictionary)\s+({{ident}})(\s:\s)?({{ident}})?)
+      push:
+        - meta_scope: meta.union.webidl
+        - match: (?:\b(partial)\s+)?(\bdictionary\b)\s+({{ident}})(\s:\s)?({{ident}})?
+          scope: meta.union.identifier.webidl
+          captures:
+            1: storage.modifier.union.webidl
+            2: storage.type.union.webidl
+            3: entity.name.union.webidl
+            4: punctuation.separator
+            5: entity.other.inherited-class.webidl
+        - match: "{"
+          scope: punctuation.section.block.begin.webidl
+          push:
+            - meta_scope: meta.union.body.webidl
+            - match: (\})(\s*\n)?
+              captures:
+                1: punctuation.definition.invalid.webidl
+                2: invalid.illegal.you-forgot-semicolon.webidl
+              pop: true
+            - match: "}"
+              scope: punctuation.section.block.end.webidl
+              pop: true
+            - include: dictionary-body
+        - include: any_POP
+
+  dictionary-body:
+    - match: (\b{{type}})\s+({{ident}})(?:\s+(=)\s+)?
+      scope: variable.other.member.webidl
+      captures:
+        1: storage.type.webidl
+        2: variable.parameter.webidl
+        3: keyword.operator.assignment.webidl
+    - include: basic-types
+
+  # Constants
+  constant:
+    - match: (\bconst\s+)(\b{{type}})\s+({{ident}})(?:\s+(=)\s+)?
+      scope: variable.other.constant.webidl
+      captures:
+        1: storage.modifier.webidl
+        2: storage.type.webidl
+        3: entity.name.constant.webidl
+        4: keyword.operator.assignment.webidl
+    - include: basic-types
+
+  # Callback
+  callback:
+    - match: (?:\b(callback)\s+({{ident}})\s+(=)\s+\b({{type}}))
+      scope: meta.method.webidl
+      captures:
+        1: storage.type.webidl
+        2: entity.name.method.webidl
+        3: keyword.operator.assignment.webidl
+        4: storage.type.method.webidl
+    - include: method-arguments

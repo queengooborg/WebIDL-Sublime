@@ -169,6 +169,13 @@ contexts:
         2: keyword.control.webidl
         3: storage.type.webidl
         4: variable.other.webidl
+      push:
+        - match: \;
+          scope: punctuation.separator.colon.webidl
+          pop: true
+        - match: (\s*\n)?
+          scope: invalid.illegal.you-forgot-semicolon.webidl
+          pop: true
 
   method:
     - match: (?:(async\s+)?(\b{{type}})\s+({{ident}})|((?:C|c)onstructor))
@@ -186,13 +193,15 @@ contexts:
       push:
         - meta_scope: meta.method.parameters.webidl
         - include: method-arguments-raw
-        - match: '(\})(\s*\n)?'
+        - match: '(\))(\s*\n)?'
           captures:
             1: punctuation.definition.invalid.webidl
             2: invalid.illegal.you-forgot-semicolon.webidl
           pop: true
-        - match: \)
-          scope: punctuation.section.block.end.webidl
+        - match: (\))(\;)
+          captures:
+            1: punctuation.section.block.end.webidl
+            2: punctuation.separator.colon.webidl
           pop: true
 
   method-arguments-raw:

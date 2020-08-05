@@ -337,7 +337,14 @@ contexts:
         2: storage.type.webidl
         3: entity.name.constant.webidl
         4: keyword.operator.assignment.webidl
-    - include: basic-types
+      push:
+        - include: basic-types
+        - match: \;
+          scope: punctuation.separator.colon.webidl
+          pop: true
+        - match: (\s*\n)?
+          scope: invalid.illegal.you-forgot-semicolon.webidl
+          pop: true
 
   # Callback
   callback:

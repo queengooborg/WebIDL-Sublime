@@ -163,6 +163,7 @@ contexts:
 
   interface-body:
     - include: interface-attribute
+    - include: constant
     - include: method
     - include: extended-attributes
 

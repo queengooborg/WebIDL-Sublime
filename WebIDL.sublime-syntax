@@ -36,12 +36,17 @@ contexts:
 
   basic-types:
     - include: numbers
+    - include: hexnumbers
     - include: strings
     - include: boolean
 
   numbers:
     - match: '\b(-)?[0-9.]+\b'
       scope: constant.numeric.webidl
+
+  hexnumbers:
+    - match: '\b0x[0-9A-F]+\b'
+      scope: constant.numeric.complex.webidl
 
   strings:
     - match: '"'

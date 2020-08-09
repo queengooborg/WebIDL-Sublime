@@ -10,7 +10,7 @@ scope: source.webidl
 variables:
   ident: (?:[_A-Za-z][_A-Za-z0-9]*\b)
   type_single: (?:(?:(?:unsigned|unrestricted)\s+)?(?:long\s+)?{{ident}}(?:<{{ident}}(?:,\s*{{ident}})?>|\?)?)
-  type: (?:(?:\((?:{{type_single}}\s+or\s+)+{{type_single}}\))|{{type_single}})
+  type: (?:\[{{ident}}\]\s+)?(?:(?:\((?:{{type_single}}\s+or\s+)+{{type_single}}\))|{{type_single}})
 
   argument_modifiers: (?:async|attribute|callback|const|constructor|deleter|dictionary|enum|getter|includes|inherit|interface|iterable|maplike|mixin|namespace|partial|readonly|required|setlike|setter|static|stringifier|typedef|unrestricted)
 

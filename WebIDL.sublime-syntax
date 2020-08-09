@@ -168,13 +168,16 @@ contexts:
     - include: extended-attributes
 
   interface-attribute:
-    - match: ((?:\b{{argument_modifiers}}\s+)*)?(\battribute\b)\s+(\b{{type}})\s+({{ident}})
+    - match: ((?:\b{{argument_modifiers}}\s+)*)?(\battribute\b)\s+(?:(?:\(({{type}})\s+(or)\s+({{type}})\))|({{type}}))\s+({{ident}})
       scope: variable.other.member.webidl
       captures:
         1: storage.modifier.webidl
         2: keyword.control.webidl
         3: storage.type.webidl
-        4: variable.other.webidl
+        4: keyword.operator.logical.webidl
+        5: storage.type.webidl
+        6: storage.type.webidl
+        7: variable.other.webidl
       push:
         - match: \;
           scope: punctuation.separator.colon.webidl
@@ -184,13 +187,16 @@ contexts:
           pop: true
 
   method:
-    - match: (?:(async\s+)?(\b{{type}})\s+({{ident}})|((?:C|c)onstructor))
+    - match: (?:(async\s+)?(?:(?:\(({{type}})\s+(or)\s+({{type}})\))|({{type}}))\s+({{ident}})|((?:C|c)onstructor))
       scope: meta.method.webidl
       captures:
         1: storage.modifier.webidl
         2: storage.type.webidl
-        3: entity.name.method.webidl
-        4: entity.name.method.webidl
+        3: keyword.operator.logical.webidl
+        4: storage.type.webidl
+        5: storage.type.webidl
+        6: entity.name.method.webidl
+        7: entity.name.method.webidl
     - include: method-arguments
 
   method-arguments:
@@ -216,13 +222,16 @@ contexts:
       scope: punctuation.separator.comma.webidl
 
   method-argument:
-    - match: (\boptional\s+)?(\b{{type}})\s+({{ident}})(?:\s+(=)\s+)?
+    - match: (\boptional\s+)?(?:(?:\(({{type}})\s+(or)\s+({{type}})\))|({{type}}))\s+({{ident}})(?:\s+(=)\s+)?
       scope: variable.parameter.webidl
       captures:
         1: storage.modifier.webidl
         2: storage.type.webidl
-        3: variable.parameter.webidl
-        4: keyword.operator.assignment.webidl
+        3: keyword.operator.logical.webidl
+        4: storage.type.webidl
+        5: storage.type.webidl
+        6: variable.parameter.webidl
+        7: keyword.operator.assignment.webidl
     - include: basic-types
 
   interface-inclusion:
@@ -260,12 +269,15 @@ contexts:
 
   # Typedef
   typedef:
-    - match: (\btypedef\b)\s+(\b{{type}})\s+({{ident}})
+    - match: (\btypedef\b)\s+(?:(?:\(({{type}})\s+(or)\s+({{type}})\))|({{type}}))\s+({{ident}})
       scope: meta.type.webidl
       captures:
         1: keyword.control.webidl
         2: storage.type.webidl
-        3: entity.name.type.webidl
+        3: keyword.operator.logical.webidl
+        4: storage.type.webidl
+        5: storage.type.webidl
+        6: entity.name.type.webidl
 
   # Enum
   enum:
@@ -321,23 +333,29 @@ contexts:
         - include: any_POP
 
   dictionary-body:
-    - match: (\b{{type}})\s+({{ident}})(?:\s+(=)\s+)?
+    - match: (?:(?:\(({{type}})\s+(or)\s+({{type}})\))|({{type}}))\s+({{ident}})(?:\s+(=)\s+)?
       scope: variable.other.member.webidl
       captures:
         1: storage.type.webidl
-        2: variable.parameter.webidl
-        3: keyword.operator.assignment.webidl
+        2: keyword.operator.logical.webidl
+        3: storage.type.webidl
+        4: storage.type.webidl
+        5: variable.parameter.webidl
+        6: keyword.operator.assignment.webidl
     - include: basic-types
 
   # Constants
   constant:
-    - match: (\bconst\s+)(\b{{type}})\s+({{ident}})(?:\s+(=)\s+)?
+    - match: (\bconst\s+)(?:(?:\(({{type}})\s+(or)\s+({{type}})\))|({{type}}))\s+({{ident}})(?:\s+(=)\s+)?
       scope: variable.other.constant.webidl
       captures:
         1: storage.modifier.webidl
         2: storage.type.webidl
-        3: entity.name.constant.webidl
-        4: keyword.operator.assignment.webidl
+        3: keyword.operator.logical.webidl
+        4: storage.type.webidl
+        5: storage.type.webidl
+        6: entity.name.constant.webidl
+        7: keyword.operator.assignment.webidl
       push:
         - include: basic-types
         - match: \;
@@ -349,7 +367,7 @@ contexts:
 
   # Callback
   callback:
-    - match: (?:\b(callback)\s+({{ident}})\s+(=)\s+\b({{type}}))
+    - match: (?:\b(callback)\s+({{ident}})\s+(=)\s+({{type}}))
       scope: meta.method.webidl
       captures:
         1: storage.type.webidl

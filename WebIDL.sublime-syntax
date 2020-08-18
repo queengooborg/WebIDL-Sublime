@@ -164,6 +164,7 @@ contexts:
 
   interface-body:
     - include: interface-attribute
+    - include: interface-declaration
     - include: constant
     - include: method
     - include: extended-attributes
@@ -183,6 +184,23 @@ contexts:
         - match: (\s*\n)?
           scope: invalid.illegal.you-forgot-semicolon.webidl
           pop: true
+
+  interface-declaration:
+    - match: ((?:\b{{argument_modifiers}}\s+)*)?(\b(?:iterable|maplike|setlike))(<{{type}}(?:,\s+{{type}})?>)
+      scope: variable.other.member.webidl
+      captures:
+        1: storage.modifier.webidl
+        2: keyword.control.webidl
+        3: storage.type.webidl
+        4: variable.other.webidl
+      push:
+        - match: \;
+          scope: punctuation.separator.colon.webidl
+          pop: true
+        - match: (\s*\n)?
+          scope: invalid.illegal.you-forgot-semicolon.webidl
+          pop: true
+    - include: method-arguments
 
   method:
     - match: (?:(async\s+)?({{type}})\s+({{ident}})|((?:C|c)onstructor))

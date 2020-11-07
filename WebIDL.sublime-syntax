@@ -186,6 +186,7 @@ contexts:
           pop: true
 
   interface-declaration:
+    - include: extended-attributes
     - match: ((?:\b{{argument_modifiers}}\s+)*)?(\b(?:iterable|maplike|setlike))(<{{type}}(?:,\s+{{type}})?>)
       scope: variable.other.member.webidl
       captures:

@@ -203,13 +203,14 @@ contexts:
     - include: method-arguments
 
   method:
-    - match: (?:(async\s+)?({{type}})\s+({{ident}})|((?:C|c)onstructor))
+    - match: ((?:\b{{argument_modifiers}}\s+)*)?(?:(async\s+)?({{type}})\s+({{ident}})|((?:C|c)onstructor))
       scope: meta.method.webidl
       captures:
         1: storage.modifier.webidl
-        2: storage.type.webidl
-        3: entity.name.method.webidl
+        2: storage.modifier.webidl
+        3: storage.type.webidl
         4: entity.name.method.webidl
+        5: entity.name.method.webidl
     - include: method-arguments
 
   method-arguments:

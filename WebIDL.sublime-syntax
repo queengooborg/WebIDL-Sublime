@@ -12,7 +12,7 @@ variables:
   type_single: (?:\[{{ident}}\]\s+)?(?:(?:(?:unsigned|unrestricted)\s+)?(?:long\s+)?{{ident}}(?:<(?:{{ident}}(?:,\s*{{ident}}|<{{ident}}>)?|\({{ident}}\s+or\s+{{ident}}\))>)?)
   type: (?:(?:\((?:{{type_single}}\s+or\s+)+{{type_single}}\))|{{type_single}})\??
 
-  argument_modifiers: (?:async|attribute|callback|const|constructor|deleter|dictionary|enum|getter|includes|inherit|interface|iterable|maplike|mixin|namespace|partial|readonly|required|setlike|setter|static|stringifier|typedef|unrestricted)
+  argument_modifiers: (?:async|attribute|callback|const|constructor|deleter|dictionary|enum|getter|includes|inherit|interface|iterable|maplike|mixin|namespace|partial|readonly|required|setlike|setter|static|typedef|unrestricted)
 
 contexts:
   prototype:
@@ -166,6 +166,7 @@ contexts:
     - include: interface-attribute
     - include: interface-declaration
     - include: constant
+    - include: stringifier-method
     - include: method
     - include: extended-attributes
 
@@ -201,6 +202,14 @@ contexts:
         - match: (\s*\n)?
           scope: invalid.illegal.you-forgot-semicolon.webidl
           pop: true
+    - include: method-arguments
+
+  stringifier-method:
+    - match: (\bstringifier)\s*({{type}})?
+      scope: meta.method.webidl
+      captures:
+        1: storage.modifier.webidl
+        2: storage.type.webidl
     - include: method-arguments
 
   method:

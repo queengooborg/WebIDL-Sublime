@@ -1,7 +1,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2020 Queen Vinyl Darkscratch
+Copyright (c) 2020-2023 Queen Vinyl Da.i'gyu-Kazotetsu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

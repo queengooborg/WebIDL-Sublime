@@ -8,7 +8,7 @@ file_extensions:
 scope: source.webidl
 
 variables:
-  ident: (?:(?:unsigned|unrestricted)\s+)?(?:long\s+)?(?:[_A-Za-z][_A-Za-z0-9]*\b)
+  ident: (?:(?:unsigned|unrestricted)\s+)?(?:long\s+)?(?:[_A-Za-z][_A-Za-z0-9]*\b|\*)
   ident_list: (?:(?:{{ident}},\s*)*)?{{ident}}
   type_single: (?:\[{{ident}}\]\s+)?(?:{{ident}}\s*(?:<(?:{{ident}}(?:,\s*{{ident}}|<{{ident}}>)?|\({{ident}}\s+or\s+{{ident}}\))>)?)
   type: (?:(?:\((?:{{type_single}}\s+or\s+)+{{type_single}}\))|{{type_single}})\??

@@ -352,12 +352,13 @@ contexts:
         - include: any_POP
 
   dictionary-body:
-    - match: ({{type}})\s+({{ident}})(?:\s+(=)\s+)?
+    - match: (required\s)?({{type}})\s+({{ident}})(?:\s+(=)\s+)?
       scope: variable.other.member.webidl
       captures:
-        1: storage.type.webidl
-        2: variable.parameter.webidl
-        3: keyword.operator.assignment.webidl
+        1: storage.modifier.webidl
+        2: storage.type.webidl
+        3: variable.parameter.webidl
+        4: keyword.operator.assignment.webidl
     - include: basic-types
 
   # Constants

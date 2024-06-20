@@ -352,7 +352,7 @@ contexts:
         - include: any_POP
 
   dictionary-body:
-    - match: (required\s)?({{type}})\s+({{ident}})(?:\s+(=)\s+)?
+    - match: ((?:\b{{argument_modifiers}}\s+)*)?({{type}})\s+({{ident}})(?:\s+(=)\s+)?
       scope: variable.other.member.webidl
       captures:
         1: storage.modifier.webidl
